@@ -1,0 +1,74 @@
+GENERAL INFORMATION:
+======================================================================================================================================
+about program:
+	this is an asynchronous multithreaded screen sharing program available in 32bit version under windows;
+	program can open ports (server) and gives opportunity for another program (client) to connect throught the one;
+	but to share server over global internet u need to forward your open port manually by using your router settings NAT,DMZ etc.
+
+about hash:
+	messages aren't hashed; if server activate hash,then hashed is paused image and frames of the screen; everything else is publicly accesable;
+
+This software is based in part on the work of the Independent JPEG Group. (libjpeg-turbo library to compress rgb pixel array into jpeg format and decompress)
+======================================================================================================================================
+
+
+
+
+INFORMATION ABOUT SETTINGS
+======================================================================================================================================
+CONFIG SHOULD BE CHANGES ONLY BY NOTEPAD OR ETC. THAT CAN HANDLE BINARY CHARACTERS AND SUCH BINARY OPERATIONS like notepad++ 'cause there are NULL characters that cannot be swapped with space characters for example; and only sector [config] should be changed;
+
+[Config]
+	"application_fps":
+		1-480 == fps of graphic interface;
+	"fastest/bad_quality_share":
+		0-1 == OFF (0) or ON (1) making frame of screen by the server in fast quality mode;
+	"inactive_timeout_in_ms":
+		0-4294967295 == how often in milliseconds the server should send refresh signals to the client
+				and how much time should waits until close connection with the client
+				in case of inactivity;
+	"compression_method_from_0_to_6":
+		0 == 4:4:4 chrominance subsampling (no chrominance subsampling);
+		1 == 4:2:2 chrominance subsampling;
+		2 == 4:2:0 chrominance subsampling;
+		3 == Grayscale;
+		4 == 4:4:0 chrominance subsampling (not fully accelerated);
+		5 == 4:1:1 chrominance subsampling (not fully accelerated);
+		6 == 4:4:1 chrominance subsampling (not fully accelerated);
+	"how_much_bytes_server_logs_must_have_to_delete_data":
+		0-4294967295 == bytes that must have file "server_logs.txt" to be deleted
+	"how_much_bytes_client_logs_must_have_to_delete_data":
+		0-4294967295 == bytes that must have file "client_logs.txt" to be deleted
+
+
+settings templates:
+	lowest CPU load (in best quality scenario):
+		quality: 10/10
+		loss: 0 				//0 means disable
+	lowest CPU load (generaly):
+		loss: 0 				//0 means disable
+		fastest/bad_quality_share: 1 		//have to change variable manually in config
+	lowest internet load:
+		quality: 1/10
+		loss: 1
+		the smallest width of the screen set by the server
+		the smallest height of the screen set by the server
+======================================================================================================================================
+
+COPYRIGHTS
+======================================================================================================================================
+program by standard_user
+font W95FA by Alina Sava
+compress and decompress jpeg format of raw rgb array by D. R. Commander,Viktor Szathmáry,JPEG Group
+program maded with help of SDL2 library,winapi,GNU Compiler etc. 
+
+
+This software is based in part on the work of the Independent JPEG Group. (libjpeg-turbo library to compress rgb pixel array into jpeg format and decompress)
+======================================================================================================================================
+
+
+BUGS AND OTHERS
+======================================================================================================================================
+i'm aware of some problem in spectrum of logic structure of the program but i hope it won't bother majority of users;
+
+======================================================================================================================================

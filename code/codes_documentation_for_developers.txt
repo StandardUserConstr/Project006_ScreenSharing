@@ -1,0 +1,217 @@
+sending data from client to server trough Project006_ScreenSharing (header);
+000 is representation of 1 byte in decimal;
+001 - 099: functions
+100 - 127: others
+128 - 255: errors
+
+001 - connect to the server
+{
+	2rd-5rd byte (4bytes): client_public_ip
+	6rd-70rd byte (65bytes): password
+		should ends with '\0';
+	71rd-72rd byte (2bytes): requested_fps
+	73rd byte (1byte): requested_quality
+	74rd byte (1byte): requested_loss
+	75rd-107rd byte (33bytes): message0
+		should ends with '\0';
+	108rd-140rd byte (33bytes): message1
+		should ends with '\0';
+
+	return codes:
+		1 - success
+			2rd byte (1byte): max_shared_quality
+			3rd-4rd byte (2bytes): max_shared_fps
+			5rd byte (1bytes): max_shared_loss
+			6rd-7rd byte (2bytes): screen_width
+			8rd-9rd byte (2bytes): screen_height
+			10rd byte (1byte): password_required
+				1 for "yes"; 0 for "no";
+			11rd byte (1byte): hash_activated
+				1 for "yes"; 0 for "no";
+			12rd-44rd byte (33bytes): message0
+				should ends with '\0';
+			45rd-77rd byte (33bytes): message1
+				should ends with '\0';
+		2 - failed: password is incorrect
+}
+
+002 - send message to the server
+{
+	2rd-34rd byte (33bytes): message0
+		should ends with '\0';
+	35rd-67rd byte (33bytes): message1
+		should ends with '\0';
+}
+
+003 - send change of requested_fps
+{
+	2rd-3rd byte (2bytes): requested_fps
+	
+	return codes:
+		2 - failed requested_fps is too small;
+		1 - failed: requested_fps is too big;
+		0 - success;
+
+}
+
+
+004 - send change of requested_quality 
+{
+	2rd byte (1bytes): requested_quality
+	
+	return codes:
+		2 - failed requested_quality is too small;
+		1 - failed: requested_quality is too big;
+		0 - success;
+
+}
+
+005 - disconnect from the server
+{
+}
+
+006 - send change of requested_loss 
+{
+	2rd byte (1bytes): requested_loss
+	
+	return codes:
+		1 - failed: requested_loss is too big;
+		0 - success;
+
+}
+
+==========================================
+
+sending data from server to client trough Project006_ScreenSharing (header);
+000 is representation of 1 byte in decimal;
+
+001 - accept/reject ScreenShare connection request from the client
+{
+	2rd byte (1byte): accept/reject response
+		1 for accept; 0 for reject;
+}
+
+002 - send message to the client
+{
+	2rd-34rd byte (33bytes): message0
+		should ends with '\0';
+	35rd-67rd byte (33bytes): message1
+		should ends with '\0';
+}
+
+003 - send new value of fps_max
+{
+	2rd-3rd (2bytes): fps_max
+}
+
+004 - send new value of quality_max
+{
+	2rd (1bytes): quality_max
+}
+
+005 - send new value of screen_width
+{
+	2rd-3rd (2bytes): screen_width
+}
+
+006 - send new value of screen_height
+{
+	2rd-3rd (2bytes): screen_height
+}
+
+007 - send new value of hash_activate
+{
+	2rd(1bytes): hash_activate
+		1 for "yes"; 0 for "no";
+}
+
+008 - send information about changing hash
+{
+}
+
+009 - pause/unpause ScreenSharing 
+{
+	2rd(1bytes): pause_or_unapuse
+		1 for "pause"; 0 for "unpause";
+	3rd-6rd(4bytes): size_of_pause_image_in_bytes
+		(if 2rd byte is 0, then this variable is ignored by the client)
+	//THIS SECTION CAN BE HASHED;
+	7rd-*(size_of_pause_image bytes): actual pixel array of pause image in unknown format
+		(if 2rd byte is 0, then this variable is ignored by the client)
+
+		return codes:
+			1rd-4rd (4bytes): received_bytes (with first 6 information bytes if 2rd byte was 1; otherwise sended value should be 2);
+
+	INFORMATION: at the start when you're connecting with the server,
+			ScreenSharing is automatically paused;
+}
+
+010 - send frame of screen 
+{
+	2rd-5rd(4bytes): size_of_pixel_array_compressed_in_bytes
+	6rd-7rd(2bytes): width_of_screen_frame	
+	8rd-9rd(2bytes): height_of_screen_frame	
+	10rd(1byte): quality_of_screen_frame		
+	11rd(1byte): hash_activate_of_screen_frame
+	//THIS SECTION CAN BE HASHED AT FIRST AND FOR SURE IS COMPRESSED;
+	12rd-*(size_of_pixel_array_compressed bytes): pixel_array_in_rgb_format (custom_method or jpeg_method)
+
+		return codes:
+			1rd-4rd (4bytes): received_bytes (with first 11 information bytes);
+			5rd (1byte): want to make request or not (it's necessary to inform before sending any request while sharing the screen);
+				1 for yes; 0 for no (just continue sharing screen);
+
+	info:
+		pitch calculation:
+			int32_t pitch =  (width* 24 + 7) / 8;
+           		                pitch  = ((pitch  + 3) / 4) * 4;
+		minimum size of the image:
+			uint32_t minimum_size = (width+1)*(height*3);   //1 for padding
+}
+
+011 - send new value of max_shared_loss
+{
+	2rd(1bytes): max_shared_loss
+}
+
+
+100 - refresh signal
+{
+	return codes:
+		100 - success
+}
+
+128 - inactivity timeout reached
+{
+}
+
+129 - close connection with the client;
+{
+}
+
+130 - server has been shut down;
+{
+}
+
+
+shape of data frame with specify options
+
+hash = active
+compression = active
+encoding process: raw_rgb_data -> jpg_format -> hash
+decoding process: unhash -> jpg_format -> jpg_texture;
+
+hash = disapled
+compression = active
+encoding process: raw_rgb_data -> jpg_format
+decoding process: jpg_format -> jpg_texture
+
+hash = disapled
+compression = disapled
+encoding process: raw_rgb_data
+decoding process: raw_rgb_data -> custom_format_texture
+
+hash = active
+compression = disapled
+encoding process: raw_rgb_data -> hash
+decoding process: hash -> raw_rgb_data -> custom_format_texture
