@@ -336,32 +336,26 @@ uint32_t UniversalTools0::decompress_per3bytes_rgb_data(const uint8_t* const dat
 
 }
 
-uint8_t UniversalTools0::hash0_32bit(uint8_t* const data_in_out,uint8_t* const hash_seed,const uint32_t size_of_data,const uint32_t size_of_hash_seed)
-{
+uint8_t UniversalTools0::hash0_32bit(uint8_t* const data_in_out,uint8_t* const hash_seed,const uint32_t size_of_data,const uint32_t size_of_hash_seed) //CHANGED VERSION
+{                                                                                                                                                           //THIS ISN'T ACTUAL VERSION OF THE FUNCTION USED IN OFFICIAL PROGRAM
     if(size_of_hash_seed<=0) return 1;
     if(size_of_data<=0) return 1;
-
-    const uint32_t alghoritm_variable0 = size_of_hash_seed^size_of_data;
 
     for(uint32_t i = 0; i!=size_of_data; i++)
     {
         data_in_out[i]+=hash_seed[i%size_of_hash_seed];
-        data_in_out[i]-=i|alghoritm_variable0<<hash_seed[i%size_of_hash_seed];
     }
     return 0;
 }
 
-uint8_t UniversalTools0::unhash0_32bit(uint8_t* const data_in_out,uint8_t* const hash_seed,const uint32_t size_of_data,const uint32_t size_of_hash_seed)
-{
+uint8_t UniversalTools0::unhash0_32bit(uint8_t* const data_in_out,uint8_t* const hash_seed,const uint32_t size_of_data,const uint32_t size_of_hash_seed) //CHANGED VERSION
+{                                                                                                                                                           //THIS ISN'T ACTUAL VERSION OF THE FUNCTION USED IN OFFICIAL PROGRAM
     if(size_of_hash_seed<=0) return 1;
     if(size_of_data<=0) return 1;
-
-    const uint32_t alghoritm_variable0 = size_of_hash_seed^size_of_data;
 
     for(uint32_t i = 0; i!=size_of_data; i++)
     {
         data_in_out[i]-=hash_seed[i%size_of_hash_seed];
-        data_in_out[i]+=i|alghoritm_variable0<<hash_seed[i%size_of_hash_seed];
     }
     return 0;
 }
