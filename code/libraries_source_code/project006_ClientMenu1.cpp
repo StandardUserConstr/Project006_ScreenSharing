@@ -263,7 +263,6 @@ void Client_Menu::do_prepared_textboxes(SDL_Event* event,Client_Menu_Variables* 
                     uint32_t requested_fps = variables->ThreadFriendly_global_variables->universal_tool0->string_to_int32((const char*)variables->textbox_data[i]);
                     if(requested_fps==0||requested_fps>480||variables->textbox_data[i][0]=='0'||(variables->window1_state==2&&(requested_fps>variables->max_shared_fps_int||send_signal_or_not==0)))
                     {
-                        memcpy(variables->textbox_data[i],variables->requested_fps,size_of_textbox_data);
                         #ifdef MAIN_PROGRAM0_DEBUG
                         variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"    requested_fps is higher or lower thand allowed or wrong format or requested_fps is higher than max_shared_fps\n",0,0});
                         variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"    logs saved in \"files/client_logs.txt\"\n",0,0});
@@ -278,6 +277,7 @@ void Client_Menu::do_prepared_textboxes(SDL_Event* event,Client_Menu_Variables* 
                         else variables->thread_vector_logs_request[0].push_back((Client_Menu::vector_log_request_from_thread){(char*)": requested_fps: is already in the queue;\n",(char*)"requested_fps: is already in the queue;",(SDL_Color){0,0,0,0},(SDL_Color){0,0,0,255},0});
                         variables->textbox_variables[i]->update_textbox();
                         SDL_Event clear_event;
+                        memcpy(variables->textbox_data[i],variables->requested_fps,size_of_textbox_data);
                         variables->textbox_variables[i]->TextBox(&clear_event,variables->textbox_data[i],variables->textbox_settings0[i],0);
                         break;
                     }
@@ -374,7 +374,6 @@ void Client_Menu::do_prepared_textboxes(SDL_Event* event,Client_Menu_Variables* 
                     uint32_t requested_quality = variables->ThreadFriendly_global_variables->universal_tool0->string_to_int32((const char*)variables->textbox_data[i]);
                     if(requested_quality==0||requested_quality>10||variables->textbox_data[i][0]=='0'||(variables->window1_state==2&&(requested_quality>variables->max_shared_quality_int||send_signal_or_not==0)))
                     {
-                        memcpy(variables->textbox_data[i],variables->requested_quality,size_of_textbox_data);
                         #ifdef MAIN_PROGRAM0_DEBUG
                         variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"    requested_quality is higher or lower thand allowed or wrong format or higher than max_shared_quality\n",0,0});
                         variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"    logs saved in \"files/client_logs.txt\"\n",0,0});
@@ -389,6 +388,7 @@ void Client_Menu::do_prepared_textboxes(SDL_Event* event,Client_Menu_Variables* 
                         else variables->thread_vector_logs_request[0].push_back((Client_Menu::vector_log_request_from_thread){(char*)": requested_quality: is already in the queue;\n",(char*)"requested_quality: is already in the queue;",(SDL_Color){0,0,0,0},(SDL_Color){0,0,0,255},0});
                         variables->textbox_variables[i]->update_textbox();
                         SDL_Event clear_event;
+                        memcpy(variables->textbox_data[i],variables->requested_quality,size_of_textbox_data);
                         variables->textbox_variables[i]->TextBox(&clear_event,variables->textbox_data[i],variables->textbox_settings0[i],0);
                         break;
                     }
@@ -531,7 +531,7 @@ void Client_Menu::do_prepared_textboxes(SDL_Event* event,Client_Menu_Variables* 
                     uint32_t requested_loss = variables->ThreadFriendly_global_variables->universal_tool0->string_to_int32((const char*)variables->textbox_data[i]);
                     if(requested_loss>100||(variables->textbox_data[i][0]=='0'&&variables->textbox_data[i][1]!='\0')||(variables->window1_state==2&&(requested_loss>variables->max_shared_loss_int||send_signal_or_not==0)))
                     {
-                        memcpy(variables->textbox_data[i],variables->requested_loss,size_of_textbox_data);
+
                         #ifdef MAIN_PROGRAM0_DEBUG
                         variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"    requested_loss is higher than allowed or wrong format or higher than max_shared_loss\n",0,0});
                         variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"    logs saved in \"files/client_logs.txt\"\n",0,0});
@@ -545,6 +545,7 @@ void Client_Menu::do_prepared_textboxes(SDL_Event* event,Client_Menu_Variables* 
                         else variables->thread_vector_logs_request[0].push_back((Client_Menu::vector_log_request_from_thread){(char*)": requested_loss: is already in the queue;\n",(char*)"requested_loss: is already in the queue;",(SDL_Color){0,0,0,0},(SDL_Color){0,0,0,255},0});
                         variables->textbox_variables[i]->update_textbox();
                         SDL_Event clear_event;
+                        memcpy(variables->textbox_data[i],variables->requested_loss,size_of_textbox_data);
                         variables->textbox_variables[i]->TextBox(&clear_event,variables->textbox_data[i],variables->textbox_settings0[i],0);
                         break;
                     }
