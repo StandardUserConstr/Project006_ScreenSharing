@@ -870,9 +870,9 @@ void Server_Menu::event_server_menu(Server_Menu_Variables* variables)
                                             {
                                                 variables->thread_vector_logs_request[0].push_back((Server_Menu::vector_log_request_from_thread){(char*)": error while refreshing your public ip;\n",(char*)"error while refreshing your public ip;",(SDL_Color){255,255,255,0},(SDL_Color){255,0,0,0}});
                                                 #ifdef MAIN_PROGRAM0_DEBUG
-                                                variables->thread_vector_stdout_stderr[0].push_back((Server_Menu::vector_stdout_stderr){(char*)"cannot get your public ip from \"whatismyip.akamai.com\"\ncheck internet connection and try again\n\n",0,0});
+                                                variables->thread_vector_stdout_stderr[0].push_back((Server_Menu::vector_stdout_stderr){(char*)"cannot get your public ip from \"api.bigdatacloud.net\"\ncheck internet connection and try again\n\n",0,0});
                                                 #endif
-                                                this->global_variables->sdl_universal_tool0->ShowSimpleMessageBox0(SDL_MESSAGEBOX_WARNING,"WARNING","cannot get your public ip from \"whatismyip.akamai.com\"\ncheck internet connection and try again","OK");
+                                                this->global_variables->sdl_universal_tool0->ShowSimpleMessageBox0(SDL_MESSAGEBOX_WARNING,"WARNING","cannot get your public ip from \"api.bigdatacloud.net\"\ncheck internet connection and try again","OK");
                                             }
                                             else
                                             {
@@ -1651,11 +1651,12 @@ void Server_Menu::server_paste_texture_to_render_and_display_window2(Server_Menu
         if(variables->frame_data_should_be_displaying==1)
         {
             unsigned char* buffer = NULL;
-            SDL_Surface* surface0;
+            //SDL_Surface* surface0;
             if(variables->operation_on_data_frame==0||variables->operation_on_data_frame==2) //if there is no jpeg compressing
             {
-                surface0 = SDL_CreateRGBSurfaceFrom(variables->main_frame_data,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
-                                                    variables->pitch_of_actual_frame,0xFF0000,0x00FF00,0x0000FF,0);
+                /*surface0 = SDL_CreateRGBSurfaceFrom(variables->main_frame_data,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
+                                                    variables->pitch_of_actual_frame,0xFF0000,0x00FF00,0x0000FF,0);*/
+                buffer = variables->main_frame_data;
 
             }
             else
@@ -1674,13 +1675,23 @@ void Server_Menu::server_paste_texture_to_render_and_display_window2(Server_Menu
                     variables->thread_vector_stdout_stderr[0].push_back((Server_Menu::vector_stdout_stderr){(char*)debug_buffor,1,1});
                     #endif
                 }
-                surface0 = SDL_CreateRGBSurfaceFrom(buffer,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
-                                                    variables->pitch_of_actual_frame,0xFF0000,0x00FF00,0x0000FF,0);
+                /*surface0 = SDL_CreateRGBSurfaceFrom(buffer,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
+                                                    variables->pitch_of_actual_frame,0xFF0000,0x00FF00,0x0000FF,0);*/
             }
-            SDL_DestroyTexture(variables->window2_main);
-            variables->window2_main = SDL_CreateTextureFromSurface(variables->render2,surface0);
-            SDL_FreeSurface(surface0);
-            if(buffer!=NULL) free(buffer);
+            static uint32_t w = 0,h = 0;
+            if(variables->width_of_actual_frame!=w||variables->height_of_actual_frame!=h)
+            {
+                w = variables->width_of_actual_frame;
+                h = variables->height_of_actual_frame;
+                SDL_DestroyTexture(variables->window2_main);
+                variables->window2_main = SDL_CreateTexture(variables->render2,SDL_PIXELFORMAT_BGR24,SDL_TEXTUREACCESS_STREAMING,w,h);
+                SDL_UpdateTexture(variables->window2_main,NULL,buffer,variables->pitch_of_actual_frame);
+            }
+            else SDL_UpdateTexture(variables->window2_main,NULL,buffer,variables->pitch_of_actual_frame);
+
+
+            //SDL_FreeSurface(surface0);
+            if(buffer!=NULL&&buffer!=variables->main_frame_data) free(buffer);
             variables->frame_data_should_be_displaying = 0;                                         //thread unlock to make next frame if needed to;
 
         }
@@ -2397,7 +2408,6 @@ uint8_t Server_Menu::server_menu_sets_variables(Server_Menu_Variables* variables
     variables->window2_pause_image = SDL_CreateTextureFromSurface(variables->render2,surface_temporary_pause);
     SDL_FreeSurface(surface_temporary_pause);
 
-
     //universal_window0
     variables->window0_bar_pressed_button = IMG_LoadTexture(this->global_variables->render,"files/sprites/universal/000.png");
     variables->window0_pressed_medium_button = IMG_LoadTexture(this->global_variables->render,"files/sprites/universal/001.png");
@@ -2419,7 +2429,11 @@ uint8_t Server_Menu::server_menu_sets_variables(Server_Menu_Variables* variables
     //universal_window2
     variables->window2_bar_pressed_button = IMG_LoadTexture(variables->render2,"files/sprites/universal/000.png");
     //variables->window2_background_no_signal = IMG_LoadTexture(variables->render2,"files/sprites/universal/009.png");
-    variables->window2_main = IMG_LoadTexture(variables->render2,"files/sprites/universal/009.png");
+//variables->window2_main = IMG_LoadTexture(variables->render2,"files/sprites/universal/009.png");
+variables->window2_main = SDL_CreateTexture(variables->render2,SDL_PIXELFORMAT_BGR24,SDL_TEXTUREACCESS_STREAMING,640,480);
+surface_temporary_pause = IMG_Load("files/sprites/universal/009.png");
+SDL_UpdateTexture(variables->window2_main,NULL,surface_temporary_pause->pixels,surface_temporary_pause->pitch);
+SDL_FreeSurface(surface_temporary_pause);
     variables->window2_fullscreen_information = IMG_LoadTexture(variables->render2,"files/sprites/universal/010.png");
     variables->window2_bar = IMG_LoadTexture(variables->render2,"files/sprites/universal/011.png");
     SDL_SetTextureBlendMode(variables->window2_bar,SDL_BLENDMODE_BLEND);

@@ -595,9 +595,9 @@ void Client_Menu::event_client_menu(Client_Menu_Variables* variables)
                                             {
                                                 variables->thread_vector_logs_request[0].push_back((Client_Menu::vector_log_request_from_thread){(char*)": error while refreshing your public ip;\n",(char*)"error while refreshing your public ip;",(SDL_Color){255,255,255,0},(SDL_Color){255,0,0,0}});
                                                 #ifdef MAIN_PROGRAM0_DEBUG
-                                                variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"cannot get your public ip from \"whatismyip.akamai.com\"\ncheck internet connection and try again\n\n",0,0});
+                                                variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"cannot get your public ip from \"api.bigdatacloud.net\"\ncheck internet connection and try again\n\n",0,0});
                                                 #endif
-                                                this->global_variables->sdl_universal_tool0->ShowSimpleMessageBox0(SDL_MESSAGEBOX_WARNING,"WARNING","cannot get your public ip from \"whatismyip.akamai.com\"\ncheck internet connection and try again","OK");
+                                                this->global_variables->sdl_universal_tool0->ShowSimpleMessageBox0(SDL_MESSAGEBOX_WARNING,"WARNING","cannot get your public ip from \"api.bigdatacloud.net\"\ncheck internet connection and try again","OK");
                                             }
                                             else
                                             {
@@ -2118,10 +2118,7 @@ void Client_Menu::client_pause_frame_operations(Client_Menu_Variables* variables
                 return;
             }
             unsigned char* buffer = NULL;
-            SDL_Surface* surface0;
-            uint8_t error = 0;
-
-            SDL_DestroyTexture(variables->window2_main);
+            SDL_Surface* surface0 = NULL;
 
             if(variables->loss_of_actual_frame!=0) //if jpg
             {
@@ -2133,36 +2130,67 @@ void Client_Menu::client_pause_frame_operations(Client_Menu_Variables* variables
                     sprintf(debug_buffor,"ERROR: %s\n",tj3GetErrorStr(this->global_variables->decompress_handle));
                     variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)debug_buffor,1,1});
                     #endif
-                    error++;
-                }
-                surface0 = SDL_CreateRGBSurfaceFrom(buffer,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
-                                                    variables->pitch_of_actual_frame,0xFF0000,0x00FF00,0x0000FF,0);
-                if(surface0==NULL) error++;
-                if(error!=0)
-                {
+
                     SDL_RWops* file;
                     file = SDL_RWFromMem(variables->buffor_to_image012,variables->size_of_image012);
                     surface0 = IMG_Load_RW(file,1);
                 }
+                //else surface0 = SDL_CreateRGBSurfaceFrom(buffer,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
+                //                                    variables->pitch_of_actual_frame,0xFF0000,0x00FF00,0x0000FF,0);
             }
             else
             {
                 buffer = (unsigned char*)malloc(variables->size_of_main_frame_data*253);
                 this->global_variables->universal_tool0->decompress_per3bytes_rgb_data(variables->main_frame_data,buffer,variables->size_of_main_frame_data);
-                surface0 = SDL_CreateRGBSurfaceFrom(buffer,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
+
+                /*surface0 = SDL_CreateRGBSurfaceFrom(buffer,variables->width_of_actual_frame,variables->height_of_actual_frame,24,
                                                     variables->pitch_of_actual_frame,0xFF0000,0x00FF00,0x0000FF,0);
                 if(surface0==NULL)
                 {
                     SDL_RWops* file;
                     file = SDL_RWFromMem(variables->buffor_to_image012,variables->size_of_image012);
                     surface0 = IMG_Load_RW(file,1);
+                }*/
+            }
+            static uint32_t w = 0,h = 0;
+            if(variables->width_of_actual_frame!=w||variables->height_of_actual_frame!=h)
+            {
+                w = variables->width_of_actual_frame;
+                h = variables->height_of_actual_frame;
+                SDL_DestroyTexture(variables->window2_main);
+                if(surface0!=NULL)
+                {
+                    variables->window2_main = SDL_CreateTextureFromSurface(variables->render2,surface0);
+                }
+                else
+                {
+                    variables->window2_main = SDL_CreateTexture(variables->render2,SDL_PIXELFORMAT_BGR24,SDL_TEXTUREACCESS_STREAMING,w,h);
+                    SDL_UpdateTexture(variables->window2_main,NULL,buffer,variables->pitch_of_actual_frame);
+                }
+
+            }
+            else
+            {
+                if(surface0!=NULL)
+                {
+                    SDL_DestroyTexture(variables->window2_main);
+                    variables->window2_main = SDL_CreateTextureFromSurface(variables->render2,surface0);
+                }
+                else
+                {
+                    Uint32 format;
+                    int access;
+                    SDL_QueryTexture(variables->window2_main,&format,&access,NULL,NULL);
+                    if(format!=SDL_PIXELFORMAT_BGR24||access!=SDL_TEXTUREACCESS_STREAMING)
+                    {
+                        SDL_DestroyTexture(variables->window2_main);
+                        variables->window2_main = SDL_CreateTexture(variables->render2,SDL_PIXELFORMAT_BGR24,SDL_TEXTUREACCESS_STREAMING,w,h);
+                    }
+                    SDL_UpdateTexture(variables->window2_main,NULL,buffer,variables->pitch_of_actual_frame);
                 }
             }
-
-            SDL_DestroyTexture(variables->window2_main);
-            variables->window2_main = SDL_CreateTextureFromSurface(variables->render2,surface0);
+            free(buffer);
             if(surface0!=NULL) SDL_FreeSurface(surface0);
-            if(buffer!=NULL) free(buffer);
             free(variables->main_frame_data);
             #ifdef MAIN_PROGRAM0_DEBUG
             variables->thread_vector_stdout_stderr[0].push_back((Client_Menu::vector_stdout_stderr){(char*)"    texture of the frame has been maded;\n",0,0});
